@@ -2,35 +2,73 @@
 
 Portable terminal with **automatic language detection**, **on-demand downloadable runtimes** from official repositories (Node, Python, Go, Rust, .NET, Java, Deno, Bun, PHP, Git, VS Build Tools) and integrated **Claude Code**.
 
-- 🎨 **Dynamic Theme** — frame color changes depending on the language you use
-- 🤖 **Autocomplete Tab** — local + AI via Gemini 2.5 Flash Lite (optional)
-- 🖥️ **Monitor status** — CPU/RAM/SWAP
-- 🌐 **Multilingual** — `en` (default) / `pt`
-- ⚡ **Persistent History ↑/↓**
+- 🎨 **Dynamic Theme** — frame color and prompt change with the active language
+- 🤖 **Autocomplete (Tab)** — local + AI via Gemini 2.5 Flash Lite (optional)
+- 🖥️ **Live monitor** — CPU / RAM / Swap bars (htop-style, color gradient)
+- 🌐 **Multilingual UI** — `en` (default) / `pt`
+- ⚡ **Persistent history** — `↑` / `↓`
+- 📦 **Single-file installer** per OS — no extra dependencies needed
 
 ![](https://github.com/programador-powershell/images/blob/main/exemplo.png)
+
 ---
 
 ## Installation
 
-### Clone
+The repo ships **3 installer scripts** — each one is fully self-contained (the app binary is embedded as base64). Just run the one for your OS:
+
+### Windows
+
+Double-click **`Windows.bat`**.
+
+It extracts the embedded `setup.exe` to `%TEMP%`, runs it, then cleans up. The installer drops:
+
+- `%LOCALAPPDATA%\UltraTerminal\app.exe`
+- `%LOCALAPPDATA%\UltraTerminal\runtimes.json`
+- `%LOCALAPPDATA%\UltraTerminal\Uninstall.exe`
+- Start Menu shortcut → **Ultra Terminal**
+- Add/Remove Programs entry
+
+No admin needed (user-local install).
+
+### macOS
 
 ```bash
-git clone https://github.com/<your-username>/ultra-terminal.git
-cd ultra-terminal
-windows.exe
-
+chmod +x Mac.sh
+./Mac.sh
 ```
+
+Installs to `~/.local/share/UltraTerminal/` and creates `~/.local/bin/ut`.
+
+### Linux
+
+```bash
+chmod +x Linux.sh
+./Linux.sh
+```
+
+Same paths as macOS.
+
+---
 
 ## Usage
 
-### Interactive Mode (REPL)
+### REPL (interactive)
 
 ```bash
-ut.exe # Windows
+ut          # Linux/macOS (or Start Menu → Ultra Terminal on Windows)
 ```
 
-### Single Command
+You'll see the fixed top frame with logo, path, tips and live CPU/RAM/Swap bars.
+The prompt changes based on the language you type:
+
+```
+ut > npm install ...     →    npm > install ...
+ut > python ...          →    py  > ...
+ut > cargo build         →    cargo > build
+```
+
+### Single command
 
 ```bash
 ut npm install express
@@ -39,20 +77,21 @@ ut claude login
 ut go build
 ```
 
-The **first time** you use a command of In a given language, the runtime is automatically downloaded from the official website (~30 MB for Node, ~10 MB for Python, etc.). Next time it will go directly.
+The **first time** you use a command of a given language, the runtime is automatically downloaded from its official source (~30 MB for Node, ~10 MB for Python, etc.). Subsequent runs go straight through.
 
 ---
 
 ## Claude Code
 
 ```bash
-ut claude login # OAuth via browser (once)
-ut claude logout # remove credentials (instantaneous, does not install anything)
-ut claude '<prompt>' # send prompt
-ut claude # Claude's interactive REPL
-
+ut claude login           # OAuth via browser (once)
+ut claude logout          # remove credentials (instant, no install needed)
+ut claude '<prompt>'      # send a prompt
+ut claude                 # Claude's interactive REPL
 ```
+
 ---
+
 ## Monitor
 ```
   CPU[||||||||||||||||||||          45.2%]   
@@ -61,22 +100,23 @@ ut claude # Claude's interactive REPL
 ```
 ![](https://github.com/programador-powershell/images/blob/main/logo.png)
 
-## Autocomplete with AI (Gemini)
+---
 
-Tab autocompletes locally (built-ins, runtimes, folder files).
+## AI Autocomplete (Gemini)
 
-For smart suggestions via Gemini 2.5 Flash Lite (free):
+`Tab` autocompletes locally (built-ins, runtimes, files in cwd).
+For smart suggestions via **Gemini 2.5 Flash Lite** (free tier):
 
-1. Get a key at **https://aistudio.google.com/apikey**
+1. Get a key at <https://aistudio.google.com/apikey>
 2. In the REPL: `mcp google <your_key>`
-3. Check: `mcp status`
+3. Verify: `mcp status`
 
-The key is saved in `.ut_config.json` in the `ut` folder.
+The key is saved in `.ut_config.json` next to the app.
 
 ```bash
-mcp google <api_key> # registers key
-mcp status # shows current status
-mcp clear # removes key
+mcp google <api_key>      # register key
+mcp status                # show current status
+mcp clear                 # remove key
 ```
 
 ---
@@ -85,6 +125,7 @@ mcp clear # removes key
 
 | Runtime | Commands | Source |
 |---|---|---|
+| Claude Code | `claude` | npm `@anthropic-ai/claude-code` |
 | Node.js 22 | `node`, `npm`, `npx` | nodejs.org |
 | TypeScript | (theme; runtime via Node) | — |
 | Python 3.13 | `python`, `py`, `pip` | python.org |
@@ -102,9 +143,9 @@ mcp clear # removes key
 
 ## Folder Detection
 
-`cd` in a project folder → theme changes automatically:
+`cd` into a project folder → theme switches automatically:
 
-| Present File | Detected Language |
+| File present | Detected language |
 |---|---|
 | `package.json` | Node |
 | `tsconfig.json` | TypeScript |
@@ -119,20 +160,20 @@ mcp clear # removes key
 
 ---
 
-## Internal Commands
+## Built-in Commands
 
-| Command | Description | 
+| Command | Description |
 |---|---|
 | `list` | List runtimes and status |
 | `where <name>` | Runtime path on disk |
-| `remove <name>` | Uninstall runtime |
+| `remove <name>` | Uninstall a runtime |
 | `history` | Command history |
-| `language <en\|pt>` | Interface language |
+| `language <en\|pt>` | UI language |
 | `mcp google <api_key>` | Configure Gemini key |
-| `mcp status` | MCP/AI status |
-| `clear` | Clear screen |
+| `mcp status` | MCP / AI status |
+| `clear` | Clear screen below frame |
 | `cd`, `pwd`, `exit` | Navigation |
-| `help` | Help |
+| `help` | Show help |
 
 ---
 
@@ -142,19 +183,38 @@ mcp clear # removes key
 |---|---|
 | ↑ / ↓ | History |
 | ← / → | Move cursor |
-| Home / End | Home / End |
+| Home / End | Line start / end |
 | **Tab** | Autocomplete (local + AI) |
-| Esc | Clear line |
+| Esc | Clear current line |
 | Enter | Run |
 
 ---
 
-## Repo Structure
+## How the installers work (for contributors)
+
+Each installer script (Windows.bat / Mac.sh / Linux.sh) embeds its OS-specific payload as base64. To regenerate them after editing the source:
+
+1. Edit `ut.ps1` (Windows source) or `ut.sh` (Unix source) and `runtimes.json`
+2. Build Windows installer:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File build/windows.ps1
+   powershell -ExecutionPolicy Bypass -File build/make-windows-bat.ps1
+   ```
+3. Build Mac/Linux installers:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File build/make-mac-linux.ps1
+   ```
+4. Commit `Windows.bat`, `Mac.sh`, `Linux.sh`
+
+The shipped repo only needs:
 
 ```
 ultra-terminal/
-├── windows.exe
-└── README.md
+├── Windows.bat       # self-extracting installer (embeds setup.exe)
+├── Mac.sh            # self-extracting installer (embeds ut.sh)
+├── Linux.sh          # self-extracting installer (embeds ut.sh)
+└──  logo.png
+
 ```
 
 ---
@@ -164,3 +224,8 @@ ultra-terminal/
 | OS | Architectures |
 |---|---|
 | Windows 10 / 11 | x64 |
+| Linux | x64, arm64 |
+| macOS | x64 (Intel), arm64 (Apple Silicon) |
+
+
+
